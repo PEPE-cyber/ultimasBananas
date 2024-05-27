@@ -61,11 +61,15 @@ def video_feed():
 @app.route('/vel_1')
 def vel_1():
     # return a json response with vel_1
+    if vel_1 is None:
+        return {"vel_1": 0}
     return {"vel_1": vel_1}
 
 @app.route('/vel_2')
 def vel_2():
     # return a json response with vel_2
+    if vel_2 is None:
+        return {"vel_2": 0}
     return {"vel_2": vel_2}
     
 
@@ -80,6 +84,7 @@ class Servicer(data_pb2_grpc.MyService):
         height = request.img.height
         global img
         img = np.frombuffer(data, dtype=np.uint8).reshape(height, width, 3)
+        # reshape the image to have the correct dimensions
         global vel_1
         vel_1 = request.v.v_l
         global vel_2

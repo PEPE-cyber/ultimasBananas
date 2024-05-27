@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Beautiful Page</title>
+    <!-- Bootstrap CSS -->
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    />
+    <!-- Custom styles -->
+    <style>
+      .gauge {
+        width: 150px;
+        height: 150px;
+        margin: auto;
+      }
+      .gauge-value {
+        text-align: center;
+        font-size: 24px;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body style="background: linear-gradient(white, orange); min-height: 100vb">
+    <div style="text-align: center; padding-top: 25px">
+      <p style="font-size: 30px; color: black; padding-bottom: 0px">
+        Dash Board
+      </p>
+      <p style="font-size: 20px; color: black; padding-top: 0px">
+        Jos&eacute; Emilio Soriano Campos - A00829390
+      </p>
+      <p style="font-size: 20px; color: black; padding-top: 0px">
+        Jose Miguel Varela Muñoz - A01620480
+      </p>
+      <p style="font-size: 20px; color: black; padding-top: 0px">
+        Andr&eacute;s Villarreal De la Torre - A01383057
+      </p>
+    </div>
+    <div class="container mt-5">
+      <div class="row">
+        <div class="col-md-6">
+          <img
+            id="frame"
+            src="{{ url_for('video_feed') }}"
+            alt="Video Stream"
+          />
+        </div>
+        <div class="col-md-6">
+          <div class="card text-center">
+            <div class="card-body">
+              <h5 class="card-title">Velocidad de las ruedas</h5>
+              <div class="row">
+                <div class="col">
+                  <div id="gauge-1"></div>
+                  <p class="mt-3">Rueda izquierda</p>
+                </div>
+                <div class="col">
+                  <div id="gauge-2"></div>
+                  <p class="mt-3">Rueda derecha</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <!-- JustGage JS -->
+    <script
+      type="text/javascript"
+      src="https://cdnjs.cloudflare.com/ajax/libs/raphael/2.1.4/raphael-min.js"
+    ></script>
+    <script
+      type="text/javascript"
+      src="https://cdnjs.cloudflare.com/ajax/libs/justgage/1.2.9/justgage.min.js"
+    ></script>
+
+    <!-- Custom script -->
+    <script>
+      var gauge = new JustGage({
+        id: "gauge-1", // the id of the html element
+        value: 0,
+        min: -10,
+        max: 10,
+        decimals: 2,
+        gaugeWidthScale: 0.6,
+      });
+
+      var gauge2 = new JustGage({
+        id: "gauge-2", // the id of the html element
+        value: 0,
+        min: -10,
+        max: 10,
+        decimals: 2,
+        gaugeWidthScale: 0.6,
+      });
+      function updateImage() {
+        fetch("{{ url_for('video_feed') }}").then(() => {
+          console.log("hola");
+          document.getElementById("frame").src = src =
+            "{{ url_for('video_feed') }}";
+          // force update the image
+        });
+      }
+      setInterval(updateImage, 100);
+
+      setInterval(() => {
+        fetch("{{ url_for('vel_1') }}")
+          .then((response) => {
+            return response.json();
+          })
+          .then((data) => {
+            gauge.refresh(data.vel_1);
+          });
+      }, 200);
+
+      setInterval(() => {
+        fetch("{{ url_for('vel_2') }}")
+          .then((response) => {
+            return response.json();
+          })
+          .then((data) => {
+            gauge2.refresh(data.vel_2);
+          });
+      }, 200);
+    </script>
+  </body>
+</html>
