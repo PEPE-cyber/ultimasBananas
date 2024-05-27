@@ -3,7 +3,7 @@
 import grpc
 import warnings
 
-import image_msg_pb2 as image__msg__pb2
+import data_pb2 as data__pb2
 
 GRPC_GENERATED_VERSION = '1.64.0'
 GRPC_VERSION = grpc.__version__
@@ -20,7 +20,7 @@ except ImportError:
 if _version_not_supported:
     warnings.warn(
         f'The grpc package installed is at version {GRPC_VERSION},'
-        + f' but the generated code in image_msg_pb2_grpc.py depends on'
+        + f' but the generated code in data_pb2_grpc.py depends on'
         + f' grpcio>={GRPC_GENERATED_VERSION}.'
         + f' Please upgrade your grpc module to grpcio>={GRPC_GENERATED_VERSION}'
         + f' or downgrade your generated code using grpcio-tools<={GRPC_VERSION}.'
@@ -30,7 +30,7 @@ if _version_not_supported:
     )
 
 
-class PointsProcessorStub(object):
+class MyServiceStub(object):
     """service
     """
 
@@ -40,45 +40,45 @@ class PointsProcessorStub(object):
         Args:
             channel: A grpc.Channel.
         """
-        self.getLocation = channel.unary_unary(
-                '/PointsProcessor/getLocation',
-                request_serializer=image__msg__pb2.LidarData.SerializeToString,
-                response_deserializer=image__msg__pb2.Pose2D.FromString,
+        self.sendData = channel.unary_unary(
+                '/MyService/sendData',
+                request_serializer=data__pb2.Data.SerializeToString,
+                response_deserializer=data__pb2.Res.FromString,
                 _registered_method=True)
 
 
-class PointsProcessorServicer(object):
+class MyServiceServicer(object):
     """service
     """
 
-    def getLocation(self, request, context):
+    def sendData(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
 
-def add_PointsProcessorServicer_to_server(servicer, server):
+def add_MyServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
-            'getLocation': grpc.unary_unary_rpc_method_handler(
-                    servicer.getLocation,
-                    request_deserializer=image__msg__pb2.LidarData.FromString,
-                    response_serializer=image__msg__pb2.Pose2D.SerializeToString,
+            'sendData': grpc.unary_unary_rpc_method_handler(
+                    servicer.sendData,
+                    request_deserializer=data__pb2.Data.FromString,
+                    response_serializer=data__pb2.Res.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-            'PointsProcessor', rpc_method_handlers)
+            'MyService', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
-    server.add_registered_method_handlers('PointsProcessor', rpc_method_handlers)
+    server.add_registered_method_handlers('MyService', rpc_method_handlers)
 
 
  # This class is part of an EXPERIMENTAL API.
-class PointsProcessor(object):
+class MyService(object):
     """service
     """
 
     @staticmethod
-    def getLocation(request,
+    def sendData(request,
             target,
             options=(),
             channel_credentials=None,
@@ -91,9 +91,9 @@ class PointsProcessor(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/PointsProcessor/getLocation',
-            image__msg__pb2.LidarData.SerializeToString,
-            image__msg__pb2.Pose2D.FromString,
+            '/MyService/sendData',
+            data__pb2.Data.SerializeToString,
+            data__pb2.Res.FromString,
             options,
             channel_credentials,
             insecure,

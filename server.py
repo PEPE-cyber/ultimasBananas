@@ -4,8 +4,8 @@ import logging
 from time import sleep
 
 # import the generated classes
-import image_msg_pb2
-import image_msg_pb2_grpc
+import data_pb2
+import data_pb2_grpc
 
 import cv2
 import numpy as np
@@ -14,6 +14,8 @@ from threading import Thread
 
 
 img = None
+vel_1 = None
+vel_2 = None
 
 # Define the dimensions of the image
 width = 400
@@ -59,35 +61,36 @@ def video_feed():
 @app.route('/vel_1')
 def vel_1():
     # return a json response with vel_1
-    return {"vel_1": 1}
+    return {"vel_1": vel_1}
 
 @app.route('/vel_2')
 def vel_2():
     # return a json response with vel_2
-    return {"vel_2": 2}
+    return {"vel_2": vel_2}
     
 
 
 # based on .proto service
-class CloudPointsServicer(image_msg_pb2_grpc.PointsProcessor):
-    def getLocation(self, request, context):
+class Servicer(data_pb2_grpc.MyService):
+    def sendData(self, request, context):
         print("Received a request")
         # convert the image to a numpy array
-        data = zlib.decompress(request.points.data)
-        width = request.points.width
-        height = request.points.height
+        data = zlib.decompress(request.img.data)
+        width = request.img.width
+        height = request.img.height
         global img
-        img = np.frombuffer(data, dtype=np.uint8).reshape(height, width, 1)
-        # print(img)
-        response = image_msg_pb2.Pose2D()
-        return response
+        img = np.frombuffer(data, dtype=np.uint8).reshape(height, width, 3)
+        global vel_1
+        vel_1 = request.v.v_l
+        global vel_2
+        vel_2 = request.v.v_r
+        return data_pb2.Res(success=True)
 
 
 def serve():
     port = "50051"
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
-    image_msg_pb2_grpc.add_PointsProcessorServicer_to_server(
-        CloudPointsServicer(), server)
+    data_pb2_grpc.add_MyServiceServicer_to_server(Servicer(), server)
     server.add_insecure_port('[::]:50051')
     server.start()
     print("Server started, listening on " + port)
